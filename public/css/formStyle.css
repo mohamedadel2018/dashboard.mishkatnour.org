@@ -1,0 +1,48 @@
+.image-show{
+    max-width: 90px;
+    border-radius: 50%;
+    box-shadow: 7px 2px 17px 0px #874e9e;
+}
+
+.block{
+display: inline-block;
+}
+
+
+.broder{
+    border-style: solid;
+    border-color: #874e9e;
+    border-radius:50%;
+    box-shadow: 7px 2px 17px 0px #874e9e;
+    width:200px;
+}
+
+
+
+
+html, body, h1, h2, h3, h4, h5{
+    font-family: "Raleway", sans-serif;
+    font-size:10px !important ;
+}
+
+
+
+.talk{
+    color:#f5f5f5;
+    font-size:14px;
+    padding:30px;
+    background-color: #512665bd;
+    border-radius: 80px 0px;
+    box-shadow: 8px 9px 0px 0px rgb(82 57 165);
+}
+
+.comment{
+    
+    font-size:14px;
+    margin-left:40px;
+    padding:10px;
+    font: 1.2em/1.1em cursive;
+    background-color:#d4d9e0;
+    border-radius:  10px;
+   
+}
