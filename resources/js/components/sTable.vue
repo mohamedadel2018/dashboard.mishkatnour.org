@@ -108,7 +108,7 @@
                     <div class="col-md-4">
                         <label>To: </label>
                          <div class="btn-group" data-toggle="buttons">
-                             <input type="number" class="form-control" v-model="tMonthFilter"placeholder="Month" >
+                             <input type="number" class="form-control" v-model="tMonthFilter" placeholder="Month" >
                              <input type="number" class="form-control" v-model="tYearFilter"  placeholder="Year" >
                         </div>
                     </div>

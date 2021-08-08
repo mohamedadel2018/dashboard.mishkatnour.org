@@ -56,6 +56,25 @@ Route::group(['middleware' => ['auth' , 'checkAvailablity']], function () {
 
 
 
+    //enquirys
+    Route::resources(['enquiry' => 'EnquiryController']);
+    Route::get('/getenquiry','EnquiryController@getenquiry');
+    Route::get('/getenquiryforone',  'EnquiryController@getenquiryforone');
+    Route::get('/getenquirySent',  'EnquiryController@getenquirySent');
+    Route::apiResources(['comment' => 'CommentController']);
+    Route::post('getcomments/{id}', 'CommentController@getcomments');
+    Route::post('showComment',  'CommentController@showComment');
+    //change Enquery status
+    Route::post('changestatus/{id}','EnquiryController@changestatus');
+    //Search Enquery status
+    Route::post('searchstatus','allenquiryController@searchstatus');
+     //allenquirys
+    Route::resources(['allenquiry' => 'allenquiryController']);
+    Route::get('/getallenquiry','allenquiryController@getallenquiry');
+
+    // check user for enquiry
+    Route::get('user' , 'EnquiryController@getUser');
+
 
 
 
@@ -186,22 +205,6 @@ Route::group(['middleware' => ['auth' , 'checkAvailablity' ,'admin']], function 
 
 });
 
-
-    //enquirys
-    Route::resources(['enquiry' => 'EnquiryController']);
-    Route::get('/getenquiry','EnquiryController@getenquiry');
-    Route::get('/getenquiryforone',  'EnquiryController@getenquiryforone');
-    Route::get('/getenquirySent',  'EnquiryController@getenquirySent');
-    Route::apiResources(['comment' => 'CommentController']);
-    Route::post('getcomments/{id}', 'CommentController@getcomments');
-    Route::post('showComment',  'CommentController@showComment');
-
-     //allenquirys
-    Route::resources(['allenquiry' => 'allenquiryController']);
-    Route::get('/getallenquiry','allenquiryController@getallenquiry');
-
-    // check user for enquiry
-    Route::get('user' , 'EnquiryController@getUser');
 
 
 // for socialll

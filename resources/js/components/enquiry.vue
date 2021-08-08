@@ -72,7 +72,21 @@
 
                <h5 class="card-header" style="font-size:14px !important; direction:rtl;" >
 
-                <span style="font-size:12px; display: flex;"> <span class="badge badge-secondary">{{enquiry.created_at | timeFormat}}</span></span>           
+                <span style="font-size:12px; display: flex;">  <span class="badge badge-secondary">{{enquiry.created_at | timeFormat}}</span> 
+             
+                 <span class="badge badge-warning mr-4 " style="font-size:12px;" >{{enquiry.status}} </span>
+                  
+                <div v-if="enquiry.user_id  == user.auth_Id" style="width:15%;height:15px;margin-right:4px;">
+                       <el-select @change="changestatusEnquiry(enquiry.id)" v-model="changestatus" size="mini"  placeholder="status">
+                            <el-option
+                            v-for="status in status_option"
+                            :key="status.value"
+                            :label="status.label"
+                            :value="status.value">
+                            </el-option>
+                        </el-select>
+                </div>
+                  </span>           
                    <div  class="mb-2" v-if="enquiry.user.photo == null">
                     <span> {{enquiry.user.name}}</span>       <img class="image-show "  width="4%" :src="'/images/users/blank-profile.png'">
                    </div>
@@ -92,11 +106,21 @@
 
             <div class="card-body">
                 <el-form ref="form"  :key="enquiry.id"> 
-                   <el-input  type="textarea" size="small" placeholder="Add Your Comment" v-model="enquiry.newcomment" ></el-input>
-                     <span class="text-danger" v-if="errors['body']">
-                                {{errors['body'][0]}}
-                        </span>
-                      <el-button class="mt-2" type="primary" size="small" @click.prevent="addNewComment(enquiry.id,enquiry.newcomment)">Comment</el-button>
+                    <div  v-if="enquiry.status == 'open'">
+                            <el-input  type="textarea" size="small" placeholder="Add Your Comment" v-model="enquiry.newcomment" ></el-input>
+                                    <span class="text-danger" v-if="errors['newcomment']">
+                                                {{errors['newcomment'][0]}}
+                                    </span>
+                            <el-button class="mt-2" type="primary" size="small" @click.prevent="addNewComment(enquiry.id,enquiry.newcomment)">Comment</el-button>
+                    </div>
+                    <div v-else>
+                             <el-input  type="textarea" size="small" placeholder="Add Your Comment" v-model="enquiry.newcomment" disabled></el-input>
+                                    <span class="text-danger" v-if="errors['newcomment']">
+                                                {{errors['newcomment'][0]}}
+                                    </span>
+                            <el-button class="mt-2" type="primary" size="small" @click.prevent="addNewComment(enquiry.id,enquiry.newcomment)" disabled>Comment</el-button>
+                    </div>
+                
                 </el-form>
                 <hr/>
              
@@ -143,9 +167,23 @@
              
                <h5 class="card-header" style="font-size:14px !important; direction:rtl;" >
 
-                <span style="font-size:12px; display: flex;"> <span class="badge badge-secondary">{{enquiry.created_at | timeFormat}}</span></span>           
+               <span style="font-size:12px; display: flex;">  <span class="badge badge-secondary">{{enquiry.created_at | timeFormat}}</span> 
+             
+                 <span class="badge badge-warning mr-4 " style="font-size:12px;" >{{enquiry.status}} </span>
+                  
+                <div v-if="enquiry.user_id  == user.auth_Id" style="width:15%;height:15px;margin-right:4px;">
+                       <el-select @change="changestatusEnquiry(enquiry.id)" v-model="changestatus" size="mini"  placeholder="status">
+                            <el-option
+                            v-for="status in status_option"
+                            :key="status.value"
+                            :label="status.label"
+                            :value="status.value">
+                            </el-option>
+                        </el-select>
+                </div>
+                  </span>             
                    <div  class="mb-2" v-if="enquiry.user.photo == null">
-                    <span> {{enquiry.user.name}}</span>       <img class="image-show "  width="4%" :src="'/images/users/blank-profile.png'">
+                    <span> {{enquiry.user.name}}</span>   <img class="image-show "  width="4%" :src="'/images/users/blank-profile.png'">
                    </div>
                     <div class="mb-2" v-else>
                       <span> {{enquiry.user.name}}</span>    <img class="image-show "  width="4%" :src="'/images/users/'+ enquiry.user.photo">
@@ -155,18 +193,25 @@
              <div class="card-body">
                   <h5  style="font-size:14px !important;direction:rtl;" > {{enquiry.body}} </h5>
                   
-               <img v-if="enquiry.photo"  :src="'/images/enquiry/'+ enquiry.photo" width="70%" :alt="enquiry.title">
+               <img v-if="enquiry.photo"  :src="'/images/enquiry/'+ enquiry.photo"  :alt="enquiry.title">
              </div>
 
 
             <div class="card-body">
-                <el-form ref="form"  :key="enquiry.id"> 
-                   <el-input  type="textarea" size="small" placeholder="Add Your Comment" v-model="enquiry.newcomment" ></el-input>
-                     <span class="text-danger" v-if="errors['body']">
-                                {{errors['body'][0]}}
-                        </span>
-                      <el-button class="mt-2" type="primary" size="small" @click.prevent="addNewComment(enquiry.id,enquiry.newcomment)">Comment</el-button>
-                </el-form>
+                 <div  v-if="enquiry.status == 'open'">
+                            <el-input  type="textarea" size="small" placeholder="Add Your Comment" v-model="enquiry.newcomment" ></el-input>
+                                    <span class="text-danger" v-if="errors['newcomment']">
+                                                {{errors['newcomment'][0]}}
+                                    </span>
+                            <el-button class="mt-2" type="primary" size="small" @click.prevent="addNewComment(enquiry.id,enquiry.newcomment)">Comment</el-button>
+                    </div>
+                    <div v-else>
+                             <el-input  type="textarea" size="small" placeholder="Add Your Comment" v-model="enquiry.newcomment" disabled></el-input>
+                                    <span class="text-danger" v-if="errors['newcomment']">
+                                                {{errors['newcomment'][0]}}
+                                    </span>
+                            <el-button class="mt-2" type="primary" size="small" @click.prevent="addNewComment(enquiry.id,enquiry.newcomment)" disabled>Comment</el-button>
+                    </div>
                 <hr/>
              
 
@@ -211,7 +256,21 @@
               
                <h5 class="card-header" style="font-size:14px !important; direction:rtl;" >
 
-                <span style="font-size:12px; display: flex;"> <span class="badge badge-secondary">{{enquiry.created_at | timeFormat}}</span></span>           
+              <span style="font-size:12px; display: flex;">  <span class="badge badge-secondary">{{enquiry.created_at | timeFormat}}</span> 
+             
+                 <span class="badge badge-warning mr-4 " style="font-size:12px;" >{{enquiry.status}} </span>
+                  
+                <div v-if="enquiry.user_id  == user.auth_Id" style="width:15%;height:15px;margin-right:4px;">
+                       <el-select @change="changestatusEnquiry(enquiry.id)" v-model="changestatus" size="mini"  placeholder="status">
+                            <el-option
+                            v-for="status in status_option"
+                            :key="status.value"
+                            :label="status.label"
+                            :value="status.value">
+                            </el-option>
+                        </el-select>
+                </div>
+                  </span>            
                    <div  class="mb-2" v-if="enquiry.user.photo == null">
                     <span> {{enquiry.user.name}}</span>       <img class="image-show "  width="4%" :src="'/images/users/blank-profile.png'">
                    </div>
@@ -223,17 +282,26 @@
              <div class="card-body">
                   <h5  style="font-size:14px !important;direction:rtl;" > {{enquiry.body}} </h5>
                   
-               <img v-if="enquiry.photo"  :src="'/images/enquiry/'+ enquiry.photo" width="70%" :alt="enquiry.title">
+               <img v-if="enquiry.photo"  :src="'/images/enquiry/'+ enquiry.photo"  :alt="enquiry.title">
              </div>
 
 
             <div class="card-body">
                 <el-form ref="form"  :key="enquiry.id"> 
-                   <el-input  type="textarea" size="small" placeholder="Add Your Comment" v-model="enquiry.newcomment" ></el-input>
-                     <span class="text-danger" v-if="errors['body']">
-                                {{errors['body'][0]}}
-                        </span>
-                      <el-button class="mt-2" type="primary" size="small" @click.prevent="addNewComment(enquiry.id,enquiry.newcomment)">Comment</el-button>
+                  <div  v-if="enquiry.status == 'open'">
+                            <el-input  type="textarea" size="small" placeholder="Add Your Comment" v-model="enquiry.newcomment" ></el-input>
+                                    <span class="text-danger" v-if="errors['newcomment']">
+                                                {{errors['newcomment'][0]}}
+                                    </span>
+                            <el-button class="mt-2" type="primary" size="small" @click.prevent="addNewComment(enquiry.id,enquiry.newcomment)">Comment</el-button>
+                    </div>
+                    <div v-else>
+                             <el-input  type="textarea" size="small" placeholder="Add Your Comment" v-model="enquiry.newcomment" disabled></el-input>
+                                    <span class="text-danger" v-if="errors['newcomment']">
+                                                {{errors['newcomment'][0]}}
+                                    </span>
+                            <el-button class="mt-2" type="primary" size="small" @click.prevent="addNewComment(enquiry.id,enquiry.newcomment)" disabled>Comment</el-button>
+                    </div>
                 </el-form>
                 <hr/>
              
@@ -288,8 +356,15 @@ export default {
             dialogAddenquiryVisible: false,
              users:{},
              user:{},
-             activeName: 'first'
-
+             activeName: 'first',
+            status_option: [{
+                    value: 'satisfied',
+                    label: 'Satisfied'
+                    }, {
+                    value: 'not satisfied',
+                    label: 'Not Satisfied'
+                    }, ],
+            changestatus:'',
         }
     },
     methods:{
@@ -360,7 +435,7 @@ export default {
             });
         },
 
-            getResults3(page = 1) {
+     getResults3(page = 1) {
         axios.get('/getenquirySent?page=' + page)
             .then(response => {
                 this.getenquirySentdata = response.data;
@@ -382,7 +457,7 @@ export default {
         }, 
         checkUser(){
             axios.get('user').then(res => {
-                        this.user = res.data;
+                        this.user = res.data;    console.log( this.user.auth_Id );
                 }).catch(err => {
                     console.log(err);
                 });
@@ -393,12 +468,7 @@ export default {
                     }).catch(err => this.errors = err.response.data.errors);
         },
 
-        // getComment(){
-        //       let {enquiryid} = this;
-        //     axios.post(`/getcomments/${enquiryid}`).then(res =>
-        //      {this.allComments = res.data; console.log( res.data);
-        //    }).catch(err => this.errors = err.response.data.errors);
-        // },
+     
             loadUsers(){
                  axios.get('/api/users').then(res => {
                     
@@ -408,7 +478,20 @@ export default {
                     console.log(err);
                 });
             },
-          
+
+        changestatusEnquiry(enquiryid){
+             let {changestatus} = this;
+                axios.post(`/changestatus/${enquiryid}`, {changestatus}).then(res => {
+                      this.$notify({
+                            title: 'Success',
+                            message: 'updated Successfully',
+                            type: 'success'
+                            });
+                             this.getenquiry();
+                    this.status = res.data; 
+                    }).catch(err => this.errors = err.response.data.errors);
+            },
+
         clearData(){
           this.dialogAddenquiryVisible = false
           this.form = {}

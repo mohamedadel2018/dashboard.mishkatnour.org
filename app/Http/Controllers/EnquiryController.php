@@ -57,7 +57,18 @@ class EnquiryController extends Controller
        } else{
         $user = 'notadmin';
        }
-        return  response()->json($user);
+       $auth_Id = Auth::id();
+        return  response()->json([ 'user' =>$user, 'auth_Id' => $auth_Id]);
+    }
+
+
+
+    public function changestatus(Request $request,$id){
+       
+        $enquiry_status = enquiry::find($id);
+        $enquiry_status->status = $request->changestatus;
+        $enquiry_status->update();
+        return   response()->json('done');
     }
 
 
@@ -99,20 +110,20 @@ class EnquiryController extends Controller
                 $enquiry->for_id = $for;
                 if($request->photo){
                     $name = time().'.'  . explode('/', explode(':', substr($request->photo, 0, strpos($request->photo, ';')))[1])[1];
-                    \Image::make($request->photo)->resize(500, 200)->save(public_path('images/enquiry/').$name);
+                    \Image::make($request->photo)->resize(300, 200)->save(public_path('images/enquiry/').$name);
                     $request->merge(['photo' => $name]);
                     $enquiry->photo = $name;
                 }
               
                 $user = user::find($for);
                 $email = $user->email;
-                $msg = 'there are new enquiry for you ' . $enquiry->title;
+                $msg = 'there are new Enquiry for you ' . $enquiry->title;
                  $emailContent =array(
                    'Name' =>$user->name,
                    'msg' =>$msg ,
-                   'enquiryName' =>$enquiry->title ,
+                  
                     );
-                    Mail::send(['html' => 'msg'], $emailContent, function ($message) use ($emailContent , $email) {
+                    Mail::send(['html' => 'msg_enquery'], $emailContent, function ($message) use ($emailContent , $email) {
 
                         $message->to($email)->subject('New enquiry')->from('pm@dashboard.mishkatnour.org', 'Mishkat Nour');
                                });
@@ -127,7 +138,7 @@ class EnquiryController extends Controller
 
                 if($request->photo){
                     $name = time().'.'  . explode('/', explode(':', substr($request->photo, 0, strpos($request->photo, ';')))[1])[1];
-                    \Image::make($request->photo)->resize(500, 200)->save(public_path('images/enquiry/').$name);
+                    \Image::make($request->photo)->resize(300, 300)->save(public_path('images/enquiry/').$name);
                     $request->merge(['photo' => $name]);
                     $enquiry->photo = $name;
                 }

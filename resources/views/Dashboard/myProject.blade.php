@@ -3,6 +3,8 @@
  use App\branch ;
  use App\user ;
  use App\task_paper;
+ use App\project;
+
 ?>
 @extends('layouts.dashboard')
 @section('dashboard_content')
@@ -156,11 +158,11 @@
   <!-- end search -->
   <!-- my tasks -->
   <div class="row">
-    <div class="col-md-12 mt-4">
-        <div style="overflow-x:auto; overflow-y: auto;
-    height:500px;">
-    <table class="table table-bordered table-fixed"
-
+    <div class="col-md-10 mt-4">
+     
+    <table class="table table-bordered table-responsive"
+style="overflow-x:auto; overflow-y: auto;
+    height:500px;"
             >
         <thead class="thead-dark">
           <tr>
@@ -213,7 +215,7 @@
                 ?>
                 {{$project->name}} </td>
               <td> {{$task->id}} </td>
-              <td style="font-size:15px;direction:rtl;">
+              <td style="font-size:13px;direction:rtl;">
                  {{$task->description}}
                </td>
                <td> {{$task->quantity}} </td>
@@ -270,9 +272,6 @@
                                       @endif
 
                                         	<button class="btn btn-primary" data-toggle="modal" data-target="#note{{$task->id}}" > Send message </button>
-
-
-
                                </td>
 
                           @endif
@@ -378,7 +377,7 @@
           </tr>
           <!-- modals -->
                       <!-- add note modal -->
-			    <div class="modal fade" id="note{{$task->id}}" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+			    <div class="modal fade font-14" id="note{{$task->id}}"  data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                     <div class="modal-dialog">
                       <div class="modal-content">
                         <div class="modal-header">
@@ -391,11 +390,11 @@
                           <form method="post" action="{{ route ('add_note') }}" >
                               @csrf
 							  <input type="hidden" name="id" value="{{$task->id}}">
-							  <div class="form-row">
+							  <div class="form-row" >
                                  <div class="form-group col-md-12">
                                    <label for="note">Note</label>
                                    <p style="color:#846161;">( This message will be sent to the manager before you change your task status ) </p>
-                                   <textarea  type="text" class="form-control" id="note"    name="note"></textarea >
+                                   <textarea  type="text" class="form-control font-14" id="note"    name="note"></textarea >
                                  </div>
                                </div>
 							  <button type="submit" class="btn btn-primary">Add</button>
@@ -411,24 +410,35 @@
         @endforeach
         </tbody>
         </table>
-     </div>
+    
    </div>
   </div>
-  <div class="text-center" style="font-size:14px;">Projects in Branch</div>
+
 	<div class="row">
+   
+
+    
       @foreach($projects as $project)
-		<div class="col-md-4 mt-4">
-			<div id="accordion">
+      <?php
+      $branch = branch::find($project->branch);
+    ?>
+      <div class="col-md-10" style="margin-top:40px;">
+          <div  class="text-center " style="font-size:14px;">Projects in {{ $branch->name}}</div>
+     </div>
+		
         <!-- card -->
+        @foreach ($projects_name = project::where('branch',$branch->id)->groupBy('name')->get() as $item_name)
+        <div class="col-md-5 mt-4">
+            <div id="accordion">
   				<div class="card" >
   				  <div class="card-header" id="heading{{$project->id}}">
   				    <h5 class="mb-0">
-  				      <button class="btn btn-link" data-toggle="collapse" data-target="#collapse{{$project->id}}" aria-expanded="false" aria-controls="collapseOne">
-                        {{$project->name}} - ( {{$project->description}} )
-                   <button type="button" class="btn btn-outline-primary float-right" data-toggle="modal" data-target="#AddModal{{$project->id}}">
+  				      <button class="btn btn-link " style="font-size:12px;" data-toggle="collapse" data-target="#collapse{{$item_name->id}}" aria-expanded="false" aria-controls="collapseOne">
+                        {{$item_name->name}} - ( {{$item_name->description}} )
+                   <button type="button" class="btn btn-outline-primary float-right" data-toggle="modal" data-target="#AddModal{{$item_name->id}}">
                         <i class="fa fa-plus"></i>
-
-  				          </button>
+                    </button>
+              
   				    </h5>
  				   </div>
 
@@ -436,26 +446,28 @@
 
     			   </div>
           </div>
+        </div>
       </div>
-    </div>
+       
+     
 
           <!-- Modal to add task -->
            <!-- Add Modal -->
-              <div class="modal fade" id="AddModal{{$project->id}}" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="AddModal" aria-hidden="true">
+          <div class="modal fade" id="AddModal{{$item_name->id}}" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="AddModal" aria-hidden="true">
                 <div class="modal-dialog">
                   <div class="modal-content">
                     <div class="modal-header">
-                      <h5 class="modal-title text-center" style="color: blue" id="AddModal">{{ucfirst($project->name)}}</h5>
+                      <h5 class="modal-title text-center" style="color: blue" id="AddModal">{{ucfirst($item_name->name)}}</h5>
                       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                       </button>
                     </div>
                     <div class="modal-body">
                       <!-- branch -->
-                    <form method="post" action="/dashboard/user/addTask/{{$project->id}}">
+                    <form method="post" action="/dashboard/user/addTask/{{$item_name->id}}">
                       @csrf
-                      <input type="hidden" value="{{$project->id}}" name="project" >
-                       <input type="hidden" class="count" name="count" value="1">
+                      <input type="hidden" value="{{$item_name->id}}" name="project" >
+                       {{-- <input type="hidden" class="count" name="count" value="1"> --}}
 
                         <!-- quantity -->
                         <div class="form-row">
@@ -471,7 +483,7 @@
                         <div class="form-row">
                           <div class="form-group col-md-12">
                             <label for="taskInput"><b>Task</b></label>
-                            <input type="text" class="form-control" id="taskInput"   name="taskInput1" required>
+                            <input type="text" class="form-control" id="taskInput"   name="taskInput" required>
                           </div>
                         </div>
                         <!-- end task -->
@@ -496,7 +508,7 @@
                         <div class="form-row">
                           <div class="form-group col-md-12">
                             <label for="inputEmail4">Urgency</label>
-                            <select id="disabledSelect" class="form-control" name="urgency1" required>
+                            <select id="disabledSelect" class="form-control" name="urgency" required>
                                  <option style="color: red" value="2">Important</option>
                                  <option style="color: orange" value="1">less Important</option>
                                  <option style="color: green" value="0">Normal</option>
@@ -512,27 +524,18 @@
                         <!-- end new tasks -->
                            <button type="submit" class="btn btn-primary float-right showTitle" title="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
                     </form>
-                    <div class="btn-group btn-group-toggle " data-toggle="buttons">
-                       <button class="btn btn-success showTitle addNewTask" title="add task"><i class="fa fa-plus" aria-hidden="true"></i> </button>
-                       <div class="deleteButtonSection">
-
-                       </div>
-
-                    </div>
-
+                  
 
                   <!-- end of branch -->
 
           <!-- end modal -->
           <!-- end of card -->
-
-
                    </div>
         </div>
 	</div>
 </div>
 
-
+@endforeach 
 
           @endforeach
 </button>

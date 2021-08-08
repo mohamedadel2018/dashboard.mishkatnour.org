@@ -18,7 +18,9 @@ class CreateEnquiriesTable extends Migration
             $table->string('title');
             $table->text('body');
             $table->string('photo')->nullable();
+            $table->text('status')->default('open');
             $table->integer('user_id')->unsigned(); 
+            $table->integer('for_id')->nullable();
             $table->timestamps();
         });
     }

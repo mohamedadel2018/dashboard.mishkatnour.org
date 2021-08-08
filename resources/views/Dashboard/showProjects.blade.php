@@ -17,8 +17,7 @@ use App\project;
   <!-- end search -->
 	<div class="row">
 	  <div class="col-md-10 offset-md-1 mt-4">
-		<div style="overflow-x:auto; overflow-y: auto;
-                      ">
+		<div style="overflow-x:auto; overflow-y: auto;">
                     <table class="table table-bordered table-fixed"
 
                          >

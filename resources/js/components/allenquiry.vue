@@ -7,26 +7,14 @@
 
         <div class="card-header border-0">
 
-                <el-dialog
-                title="New Orders"
-                :visible.sync="dialogVisible"
-                width="50%"
-               center>
-                <span>
-                    <el-form label-width="20%" @submit.prevent="addNewOrders">
-                        <el-form-item label="Orders Name">
-                            <!-- <el-input placeholder="Orders Name" v-model="form.name"></el-input> -->
-                            <span class="text-danger" v-if="errors['name']">
-                                {{errors['name'][0]}}
-                            </span>
-                        </el-form-item>
-                    </el-form>
-                </span>
-                <span slot="footer" class="dialog-footer">
-                    <el-button @click="dialogVisible = false">Cancel</el-button>
-                    <el-button type="primary" @click.prevent="addNewOrders()">Confirm</el-button>
-                </span>
-                </el-dialog>
+             <el-select @change="searchstatusEnquiry()" v-model="changestatus" size="mini"  placeholder="search">
+                <el-option
+                    v-for="status in status_option"
+                    :key="status.value"
+                    :label="status.label"
+                    :value="status.value">
+                    </el-option>
+                </el-select>
 
         </div>
             <el-table
@@ -62,6 +50,17 @@
                     </div>
                 </template>
                 </el-table-column>
+
+                 <el-table-column
+                label="Status" width="80">
+                 <template  slot-scope="scope">
+                
+                 <p style="font-size:10px;"> {{scope.row.status}}</p>
+                
+
+                </template>
+                </el-table-column>
+
                 <el-table-column
                 label="From">
                  <template  slot-scope="scope">
@@ -77,7 +76,9 @@
                 </el-table-column>
               
                 <el-table-column
-                align="right">
+                align="right" 
+                width="130px"
+                >
                 <template slot="header" slot-scope="scope">
                     <el-input
                     v-model="search"
@@ -89,7 +90,7 @@
                <template slot-scope="scope">
 
                          <el-button    @click.prevent="editEnquiry(scope.row)"  icon="el-icon-edit" circle></el-button>
-                                 <el-dialog
+                            <el-dialog
                                     title="Edit Enquiry"
                                     :visible.sync="editEnquiryVisible"
                                     width="50%"
@@ -128,7 +129,18 @@
                                 </el-select>
                                    <h6 style="color:red;"> if you not selected One you will send enquiry for (all Users) </h6>
                     </el-form-item>
-             
+
+                    <el-form-item label="status">
+                        <el-select  v-model="form.status"  placeholder="search">
+                            <el-option
+                                v-for="status in status_option"
+                                :key="status.value"
+                                :label="status.label"
+                                :value="status.value">
+                            </el-option>
+                            </el-select>
+                    </el-form-item>
+
                     </el-form>
                                     </span>
                                     <span slot="footer" class="dialog-footer">
@@ -182,14 +194,28 @@
         allenquirys:[],
          form:{},
          users:{},
+        status_option: [ 
+            {
+            value: 'all',
+            label: 'all'
+            },{
+            value: 'open',
+            label: 'Open'
+            },{
+            value: 'satisfied',
+            label: 'Satisfied'
+            }, {
+            value: 'not satisfied',
+            label: 'Not Satisfied'
+            }, ],
       }
     },
     methods: {
 
          getenquiry(){
               axios.get('/getallenquiry').then(res =>  { 
-                console.log(res.data.data);
-                this.allenquirys = res.data;
+           
+                this.allenquirys = res.data;     console.log(res.data.data);
                
               })
              .catch(err => { console.log(err)});
@@ -282,6 +308,13 @@
                 }).catch(err => {
                     console.log(err);
                 });
+            },
+        searchstatusEnquiry(){
+             let {changestatus} = this;
+                axios.post(`/searchstatus`, {changestatus}).then(res => {
+                            
+                    this.allenquirys = res.data; 
+                    }).catch(err => this.errors = err.response.data.errors);
             },
     },
     created(){

@@ -24,23 +24,24 @@ class userTaskController extends Controller
     public function addTask(Request $request , $id) {
 
     	// validate Input
-
+      
          try
          {
-            for ($i=1 ; $i <= $request->count ; $i++) {
-
+         
+            // dd( $request->input('quantity'));
             $project = project::find($id);
-            $task = new task; $request->input('name'.$i);
-            $task->description = $request->input('taskInput'.$i);
-            $task->dueDate = $request->input('date'.$i);
-            $task->urgency = $request->input('urgency'.$i);
-              $task->quantity = $request->input('quantity'.$i);
+            $task = new task; 
+         
+            $task->description = $request->input('taskInput');
+            $task->dueDate = $request->input('date');
+            $task->urgency = $request->input('urgency');
+            $task->quantity = $request->input('quantity');
+            
             $project->tasks()->save($task);
-
             $res = new task_respon;
             $res->user_id = Auth::user()->id;
             $task->tasks()->save($res);
-            }
+            
             // select project
             // echo ($id);
 

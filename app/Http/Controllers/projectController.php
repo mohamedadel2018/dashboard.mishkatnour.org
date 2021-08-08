@@ -126,7 +126,7 @@ class projectController extends Controller
          // try
          // {
              foreach($branchs as $branch){
-                $project = new project ;
+                $project = new project;
                 $project->name = $request->projectSelect;
                 $project->description = $projectdata->description;
                 $project->location = $request->projectLocation;
@@ -386,7 +386,8 @@ class projectController extends Controller
         // // $task_id = $rows->task_id;
         // $tasks = task::find($task_id)->first();
         $branch_id = Auth::user()->branch;
-        $projects = project::where('branch' , '=', $branch_id)->get();
+        $projects = project::groupBy('branch')->orderBy('id','asc')->get();
+        // dd( $projects);
        return view('Dashboard.myProject')->with(['projects' => $projects , 'rows' => $rows , 'users' => $users]);
 
     }

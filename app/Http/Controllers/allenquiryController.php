@@ -80,12 +80,11 @@ class allenquiryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
-        // dd($id);
-        // $request->validate([
-        //     'title' => 'required',
-        //     'body' => 'required',
-        // ]);
+        // dd( $request->all());
+        $request->validate([
+            'title' => 'required',
+            'body' => 'required',
+        ]);
 
         if($request->for != []){
 
@@ -98,22 +97,23 @@ class allenquiryController extends Controller
         $update_enqury->title = $request->title;
         $update_enqury->body = $request->body;
         $update_enqury->for_id = $for;
+        $update_enqury->status =  $request->status;
         if($request->photo  !=   $update_enqury->photo){
             $name = time().'.'  . explode('/', explode(':', substr($request->photo, 0, strpos($request->photo, ';')))[1])[1];
-            \Image::make($request->photo)->resize(500, 200)->save(public_path('images/enquiry/').$name);
+            \Image::make($request->photo)->resize(300, 300)->save(public_path('images/enquiry/').$name);
             $request->merge(['photo' => $name]);
             $update_enqury->photo = $name;
         }
 
         $user = user::find($for);
         $email = $user->email;
-        $msg = 'there are new enquiry for you ' . $enquiry->title;
+        $msg = 'there are new enquiry for you ' . $update_enqury->title;
          $emailContent =array(
            'Name' =>$user->name,
            'msg' =>$msg ,
-           'enquiryName' =>$enquiry->title ,
+           'enquiryName' => $update_enqury->title ,
             );
-            Mail::send(['html' => 'msg'], $emailContent, function ($message) use ($emailContent , $email) {
+            Mail::send(['html' => 'msg_enquery'], $emailContent, function ($message) use ($emailContent , $email) {
 
                 $message->to($email)->subject('New enquiry')->from('pm@dashboard.mishkatnour.org', 'Mishkat Nour');
                        });
@@ -125,10 +125,10 @@ class allenquiryController extends Controller
         $update_enqury =  enquiry::find($id);
         $update_enqury->title = $request->title;
         $update_enqury->body =  $request->body;
-
+        $update_enqury->status =  $request->status;
         if($request->photo !=   $update_enqury->photo){
             $name = time().'.'  . explode('/', explode(':', substr($request->photo, 0, strpos($request->photo, ';')))[1])[1];
-            \Image::make($request->photo)->resize(500, 200)->save(public_path('images/enquiry/').$name);
+            \Image::make($request->photo)->resize(300, 300)->save(public_path('images/enquiry/').$name);
             $request->merge(['photo' => $name]);
             $update_enqury->photo = $name;
         }
@@ -137,6 +137,17 @@ class allenquiryController extends Controller
         }
 
         return  response()->json('',200);
+    }
+
+
+
+    public function searchstatus(Request $request){
+        if($request->changestatus == 'all'){
+        $enquiries= enquiry::with('user')->with('for')->latest()->paginate(8);
+        }else{
+            $enquiries= enquiry::with('user')->with('for')->where('status',$request->changestatus)->latest()->paginate(8);
+        }
+        return  response()->json($enquiries);
     }
 
     /**
