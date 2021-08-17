@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class enquiry extends Model
 {
@@ -10,6 +11,7 @@ class enquiry extends Model
 
     protected $guarded = [];
 
+ 
     public function comment()
     {
         return $this->hasMany('App\comment','enquiry_id');
@@ -24,5 +26,7 @@ class enquiry extends Model
     {
         return $this->belongsTo('App\User','for_id');
     }
+
+
   
 }

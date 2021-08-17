@@ -20,7 +20,9 @@ class profileController extends Controller
     	 	$done = 0 ;
     		$delay = 0 ;
     		$canceled = 0 ;
-    		$late = 0 ;
+			$late = 0 ;
+			$outDate = 0;
+			$block = 0;
     		$res_rows = $user->tasks()->get();
     		$tasks = array();
     		foreach ($res_rows as $res_row) {
@@ -43,7 +45,12 @@ class profileController extends Controller
     				case 'canceled':
     					$canceled ++ ;
     					break;
-
+					case 'outDate':
+						$outDate ++ ;
+						break;
+					case 'block':
+						$block ++ ;
+						break;
     			}
 
     			// array_push($tasks ,$task);
@@ -54,7 +61,9 @@ class profileController extends Controller
     		'done' => $done ,
     		'delay' => $delay,
     		'canceled' => $canceled,
-    		'late' => $late
+			'late' => $late,
+			'outDate' => $outDate,
+			'block' => $block,
 
     	);
         $paperNames = paper::all();

@@ -185,7 +185,7 @@ use App\branch;
               <div class="form-group col-md-12">
                 <label for="objDescription">change Objective</label>
                 <select id="Project" class="form-control" name="objectiveSelect">
-                    <option value="null">No changes</option>
+                    <option value="{{null}}">No changes</option>
                   @foreach ($objectives as $objective)
               
                    <option value="{{$objective->id}}">{{$objective->description}}</option>

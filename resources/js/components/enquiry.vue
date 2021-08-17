@@ -9,9 +9,10 @@
                 title="New Enquiry"
                 :visible.sync="dialogAddenquiryVisible"
                 width="60%"
-                center>
+                center
+                >
                 <span>
-                    <el-form   label-width="20%" >
+                    <el-form   label-width="20%" v-loading="loading">
                         <el-form-item label="Enquiry title*" center>
                         <el-input placeholder="Add Your title" v-model="form.title"></el-input>
                             <span class="text-danger" v-if="errors['title']">
@@ -55,7 +56,7 @@
 
 <template>
 
-  <el-tabs v-model="activeName" stretch>
+  <el-tabs v-model="activeName" stretch v-loading="loading_page">
     <el-tab-pane name="first" >
 
         <span slot="label"> For all Users 
@@ -71,7 +72,7 @@
          
 
                <h5 class="card-header" style="font-size:14px !important; direction:rtl;" >
-
+                    
                 <span style="font-size:12px; display: flex;">  <span class="badge badge-secondary">{{enquiry.created_at | timeFormat}}</span> 
              
                  <span class="badge badge-warning mr-4 " style="font-size:12px;" >{{enquiry.status}} </span>
@@ -86,8 +87,9 @@
                             </el-option>
                         </el-select>
                 </div>
-                  </span>           
-                   <div  class="mb-2" v-if="enquiry.user.photo == null">
+                  </span>
+                             
+                   <div  class="mb-2 mt-4" v-if="enquiry.user.photo == null">
                     <span> {{enquiry.user.name}}</span>       <img class="image-show "  width="4%" :src="'/images/users/blank-profile.png'">
                    </div>
                     <div class="mb-2" v-else>
@@ -100,7 +102,7 @@
              <div class="card-body">
                   <h5  style="margin-left:1%;font-size:14px !important;direction:rtl;" > {{enquiry.body}} </h5>
                   
-               <img v-if="enquiry.photo"  :src="'/images/enquiry/'+ enquiry.photo"  :alt="enquiry.title">
+               <img v-if="enquiry.photo" width="50%"  :src="'/images/enquiry/'+ enquiry.photo"  :alt="enquiry.title">
              </div>
 
 
@@ -182,7 +184,7 @@
                         </el-select>
                 </div>
                   </span>             
-                   <div  class="mb-2" v-if="enquiry.user.photo == null">
+                   <div  class="mb-2 mt-4" v-if="enquiry.user.photo == null">
                     <span> {{enquiry.user.name}}</span>   <img class="image-show "  width="4%" :src="'/images/users/blank-profile.png'">
                    </div>
                     <div class="mb-2" v-else>
@@ -193,7 +195,7 @@
              <div class="card-body">
                   <h5  style="font-size:14px !important;direction:rtl;" > {{enquiry.body}} </h5>
                   
-               <img v-if="enquiry.photo"  :src="'/images/enquiry/'+ enquiry.photo"  :alt="enquiry.title">
+               <img v-if="enquiry.photo"  width="50%"  :src="'/images/enquiry/'+ enquiry.photo"  :alt="enquiry.title">
              </div>
 
 
@@ -271,7 +273,7 @@
                         </el-select>
                 </div>
                   </span>            
-                   <div  class="mb-2" v-if="enquiry.user.photo == null">
+                   <div  class="mb-2 mt-4" v-if="enquiry.user.photo == null">
                     <span> {{enquiry.user.name}}</span>       <img class="image-show "  width="4%" :src="'/images/users/blank-profile.png'">
                    </div>
                     <div class="mb-2" v-else>
@@ -282,7 +284,7 @@
              <div class="card-body">
                   <h5  style="font-size:14px !important;direction:rtl;" > {{enquiry.body}} </h5>
                   
-               <img v-if="enquiry.photo"  :src="'/images/enquiry/'+ enquiry.photo"  :alt="enquiry.title">
+               <img v-if="enquiry.photo"  width="50%"  :src="'/images/enquiry/'+ enquiry.photo"  :alt="enquiry.title">
              </div>
 
 
@@ -365,6 +367,8 @@ export default {
                     label: 'Not Satisfied'
                     }, ],
             changestatus:'',
+             loading: false,
+             loading_page:true,
         }
     },
     methods:{
@@ -384,7 +388,8 @@ export default {
             }
         },
         addNewenquiry(){
-             axios.post('/enquiry', this.form).then(res => {
+             axios.post('/dashboard/enquiry', this.form).then(res => {
+                  this.loading = true;
                   this.clearData();
               this.$notify({
                     title: 'Success',
@@ -400,6 +405,7 @@ export default {
       
         getenquiry(){
               axios.get('/getenquiry').then(res =>  { 
+                    this.loading_page = false;
                 // console.log(res.data.data);
                 this.enquirys = res.data;
                
@@ -488,6 +494,8 @@ export default {
                             type: 'success'
                             });
                              this.getenquiry();
+                            this.getenquiryforone();
+                            this.getenquirySent();
                     this.status = res.data; 
                     }).catch(err => this.errors = err.response.data.errors);
             },

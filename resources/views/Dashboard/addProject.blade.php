@@ -34,6 +34,7 @@
                 <div class="form-group col-md-12">
                   <label for="objDescription">Select Project</label>
                   <select id="Project" class="form-control" name="projectSelect">
+                      <option value="{{null}}">No One</option>
                     @foreach ($projects as $project)
                      <option value="{{$project->id}}">{{$project->name}} - {{str_limit($project->location)}}</option>
                      @endforeach

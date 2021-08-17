@@ -78,9 +78,9 @@
 
                                                                           {{$msg}} <br>
                                                                           
-                                                                        <a href="https://dashboard.mishkatnour.org">See your Enquiry</a>
+                                                                        <a href="https://dashboard.mishkatnour.org">See your Enquiry</a> <br>
 
-                                                                       
+                                                                          <span style="color:red;">this enquiry will be expired in one day </span>
  
                                                                         </p>
 

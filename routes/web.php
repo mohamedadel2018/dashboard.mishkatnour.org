@@ -27,8 +27,12 @@ Route::group(['middleware' => ['auth' , 'checkAvailablity']], function () {
     Route::get('/Dashboard', function () {
         return view('Dashboard.dashboard');
     });
+    
     // project for user
     Route::get('/dashboard/availableProject', 'projectController@myproject');
+    Route::get('/dashboard/availableProject/searchtasks','projectController@selectsearch')->name('selectsearch');
+    Route::get('/dashboard/availableProject/timetasks','projectController@timesearch')->name('timesearch');
+
     Route::post('/dashboard/user/addTask/{id}', 'userTaskController@addTask');
     Route::post('/dashboard/structure/addUserphoto', 'userTaskController@addUserphoto')->name('addUserphoto');
 
@@ -57,7 +61,7 @@ Route::group(['middleware' => ['auth' , 'checkAvailablity']], function () {
 
 
     //enquirys
-    Route::resources(['enquiry' => 'EnquiryController']);
+    Route::resources(['/dashboard/enquiry' => 'EnquiryController']);
     Route::get('/getenquiry','EnquiryController@getenquiry');
     Route::get('/getenquiryforone',  'EnquiryController@getenquiryforone');
     Route::get('/getenquirySent',  'EnquiryController@getenquirySent');
@@ -69,7 +73,7 @@ Route::group(['middleware' => ['auth' , 'checkAvailablity']], function () {
     //Search Enquery status
     Route::post('searchstatus','allenquiryController@searchstatus');
      //allenquirys
-    Route::resources(['allenquiry' => 'allenquiryController']);
+    Route::resources(['/dashboard/allenquiry' => 'allenquiryController']);
     Route::get('/getallenquiry','allenquiryController@getallenquiry');
 
     // check user for enquiry
@@ -167,10 +171,18 @@ Route::group(['middleware' => ['auth' , 'checkAvailablity' ,'admin']], function 
     Route::post('/dashboard/addTask/{id}', 'projectController@addTask')->name('addTask');
     Route::get('/dashboard/tasks', 'tasksController@index');
 
+    // Outdate Tasks
+    Route::get('/dashboard/outDateTasks', 'outDateTasksController@index');
+    Route::get('/dashboard/outDateTasks/outDatesearch','outDateTasksController@outDatesearch')->name('outDatesearch');
+    Route::post('/dashboard/outDateTasks/renwalDueTask','outDateTasksController@renwalDueTask')->name('renwalDueTask');
+    Route::post('/dashboard/outDateTasks/blockTask','outDateTasksController@blockTask')->name('blockTask');
+
+    
     // follow Tasks
     Route::get('/dashboard/task/follow-up/task', 'followTaskController@index');
     Route::post('/dashboard/task/follow-up/task/taskConfirmation', 'followTaskController@taskConfirmation')->name('taskConfirmation');
     Route::post('/dashboard/task/follow-up/task/taskNotConfirmation', 'followTaskController@taskNotConfirmation')->name('taskNotConfirmation');
+    Route::get('/dashboard/task/follow-up/task/followsearch','followTaskController@followsearch')->name('followsearch');
 
     Route::post('/dashboard/task/follow-up/task/statusConfirmation', 'followTaskController@statusConfirmation')->name('statusConfirmation');
 

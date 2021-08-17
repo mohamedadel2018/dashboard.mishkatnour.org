@@ -10,6 +10,7 @@
 <!-- nav css -->
 <link rel="stylesheet" href="{{ asset('css/navStyle.css')}}">
 <link rel="stylesheet" href="{{ asset('css/formStyle.css')}}">
+<link rel="stylesheet" href="{{ asset('css/adminlte.css')}}">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 <!-- import CSS -->
 {{-- <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css"> --}}
@@ -28,8 +29,8 @@
 
 html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif ; font-size: 11px}
 
-td,th{
-     white-space: nowrap;
+td, th {
+    white-space: nowrap;
 }
 
 .showTitle{
@@ -130,7 +131,7 @@ td,th{
 
 <!-- Sidebar/menu -->
     <div class="wrapper d-flex align-items-stretch">
-      <nav id="sidebar" style= "background-color: #343a40">
+      <nav id="sidebar" class="not-print" style= "background-color: #343a40">
         <div class="custom-menu">
           <button type="button" id="sidebarCollapse" class="btn btn-primary">
                         <i class="fa fa-bars"></i>
@@ -140,6 +141,9 @@ td,th{
         <div class="p-4 pt-5">
           <!-- <h1><a href="index.html" class="logo">Mishkat Nour</a></h1> -->
           <ul class="list-unstyled components mb-5">
+
+     
+
            <!--  <li class="active">
               <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Home</a>
               <ul class="collapse list-unstyled" id="homeSubmenu">
@@ -156,7 +160,34 @@ td,th{
             </li> -->
     <!-- logout -->
     
-      
+               <!-- Notifications Dropdown Menu -->
+      <li class="nav-item dropdown">
+          <a class="nav-link" data-toggle="dropdown" href="#">
+            <i class="far fa-bell"></i>
+            <span class="badge badge-warning navbar-badge">15</span>
+          </a>
+          <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+            <span class="dropdown-item dropdown-header">15 Notifications</span>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item">
+              <i class="fas fa-envelope mr-2"></i> 4 new messages
+              <span class="float-right text-muted text-sm">3 mins</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item">
+              <i class="fas fa-users mr-2"></i> 8 friend requests
+              <span class="float-right text-muted text-sm">12 hours</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item">
+              <i class="fas fa-file mr-2"></i> 3 new reports
+              <span class="float-right text-muted text-sm">2 days</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+          </div>
+      </li>
+
       <a href="{{ route('logout') }}" class="w3-bar-item w3-button float-right showTitle" 
           onclick="event.preventDefault();
         document.getElementById('logout-form').submit();" title="Logout"><i class="fa fa-sign-out" >
@@ -207,7 +238,11 @@ td,th{
       <i class="fa fa-check "> </i> Done Tasks
     </a>
   </li>
-
+  <li>
+    <a href="/dashboard/outDateTasks" >
+      <i class="fa fa-window-close" aria-hidden="true"></i> OutDate Tasks
+    </a>
+  </li>
    <li>
     <a href="/dashboard/task/follow-up/task">
       <i class="fa fa-check-square-o "> </i> pending 
@@ -219,10 +254,10 @@ td,th{
     </a>
   </li>
   <li>
-  <a href="/enquiry" >
+  <a href="/dashboard/enquiry" >
     Enquiries  <span class="badge badge-primary ml-4">New</span>
   </a>
-  <a href="/allenquiry" >
+  <a href="/dashboard/allenquiry" >
    Edit Enquiries  <span class="badge badge-primary ml-4">New</span>
   </a>
   </li>
@@ -266,7 +301,7 @@ td,th{
     <a href="/dashboard/availableProject" >
        Profile
     </a>
-    <a href="/enquiry" >
+    <a href="/dashboard/enquiry" >
       Enquiries  <span class="badge badge-primary ml-4">New</span>
     </a>
     </li>
@@ -344,13 +379,13 @@ td,th{
 
           </script>                    
       @endif
-      @if(Session::has('success'))
+      {{-- @if(Session::has('success'))
           <script type="text/javascript">
             alert('data is added successfully');
             
 
           </script>                    
-      @endif
+      @endif --}}
 
       @if(Session::has('exists'))
           <script type="text/javascript">

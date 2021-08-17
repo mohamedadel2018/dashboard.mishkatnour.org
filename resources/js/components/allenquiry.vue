@@ -52,11 +52,9 @@
                 </el-table-column>
 
                  <el-table-column
-                label="Status" width="80">
+                label="Status" >
                  <template  slot-scope="scope">
-                
                  <p style="font-size:10px;"> {{scope.row.status}}</p>
-                
 
                 </template>
                 </el-table-column>
@@ -70,7 +68,7 @@
 
                  <el-table-column
                 label="To">
-                 <template  slot-scope="scope">
+                 <template  slot-scope="scope" >
                     <p style="font-size:10px;"> {{editfor(scope.row.for, scope.row.for_id )}}</p>
                 </template>
                 </el-table-column>
@@ -207,7 +205,13 @@
             }, {
             value: 'not satisfied',
             label: 'Not Satisfied'
-            }, ],
+            },
+             {
+            value: 'No Response',
+            label: 'No Response'
+            },
+            
+          ],
       }
     },
     methods: {
@@ -250,7 +254,7 @@
           type: 'warning'
         }).then(() => {
          
-            axios.delete(`allenquiry/${row.id}`).then(res => {
+            axios.delete(`/dashboard/allenquiry/${row.id}`).then(res => {
                   
                          this.$notify({
                             title: 'Success',
@@ -283,7 +287,7 @@
 
         },
          updateEnquiry(row){
-             axios.put(`allenquiry/${row}`, this.form ).then(res => {
+             axios.put(`/dashboard/allenquiry/${row}`, this.form ).then(res => {
                this.$notify({
                             title: 'Success',
                             message: 'Enquiry updated Successfully',

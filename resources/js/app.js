@@ -45,6 +45,7 @@ Vue.component('enquiry-component', require('./components/enquiry.vue').default);
 Vue.component('allenquiry-component', require('./components/allenquiry.vue').default);
 
 
+
 import ProgressBar from 'vuejs-progress-bar';
 import CoreuiVue from '@coreui/vue';
 import CoreuiVueCharts from '@coreui/vue-chartjs';

@@ -9,6 +9,8 @@ use Auth;
 use App\comment;
 use App\User;
 use Mail;
+use Carbon\Carbon;
+
 class EnquiryController extends Controller
 {
     /**
@@ -27,8 +29,22 @@ class EnquiryController extends Controller
     {
         //
       
+
         $all_enquiry = enquiry::with('comment')->with('user')->where('for_id',null)->latest()->paginate(5);
     
+
+        foreach($all_enquiry as $forone_enquir){
+            $time = $forone_enquir->created_at;
+            $dt = Carbon::create($time->year,  $time->month, $time->day , $time->hour );
+            $dt->toDateTimeString();
+
+            if($forone_enquir->created_at <= $dt->addDay() && count($forone_enquir->comment) == 0 ){
+                 $enquiry  = enquiry::find($forone_enquir->id);
+                 $enquiry->status = 'No Response';
+                 $enquiry->update();
+              }
+        }
+
         return  response()->json($all_enquiry);
        
     }
@@ -37,7 +53,20 @@ class EnquiryController extends Controller
     public function getenquiryforone(){
 
         $forone_enquiry = enquiry::with('comment')->with('user')->where('for_id',Auth::id())->latest()->paginate(5);
-        // dd( $forone_enquiry);
+       
+        foreach($forone_enquiry as $forone_enquir){
+
+            $time = $forone_enquir->created_at;
+            $dt = Carbon::create($time->year,  $time->month, $time->day , $time->hour , $time->minute);
+            $dt->toDateTimeString();
+            // dd($time->diffInMinutes());
+            if($dt->diffInMinutes() >=  1540 && count($forone_enquir->comment) == 0){
+                 $enquiry  = enquiry::find($forone_enquir->id);
+                 $enquiry->status = 'No Response';
+                 $enquiry->update();
+              }
+        }
+
         return  response()->json($forone_enquiry);
     }
 
@@ -45,9 +74,23 @@ class EnquiryController extends Controller
     public function getenquirySent(){
 
         $Sent_enquiry = enquiry::with('comment')->with('user')->where('user_id',Auth::id())->latest()->paginate(5);
-        // dd( $forone_enquiry);
-        return  response()->json($Sent_enquiry);
+        
+            foreach($Sent_enquiry as $sent_enquir){
+
+                $time = $sent_enquir->created_at;
+                $dt = Carbon::create($time->year,  $time->month, $time->day , $time->hour, $time->minute);
+                $dt->toDateTimeString();
+                // dd( $dt->diffInMinutes());
+                if($dt->diffInMinutes() >=  1440 && count($sent_enquir->comment) == 0){
+                    $enquiry  = enquiry::find($sent_enquir->id);
+                    $enquiry->status = 'No Response';
+                    $enquiry->update();
+                }
+            }
+
+                return  response()->json($Sent_enquiry);
     }
+
 
 
     public function getUser() {
@@ -100,7 +143,7 @@ class EnquiryController extends Controller
         if($request->for != []){
 
             $fors = $request->for;
-            // dd($fors);
+            // dd(count($fors));
             // dd($fors);
             foreach($fors as $for){
                 $enquiry = new enquiry();
@@ -138,15 +181,32 @@ class EnquiryController extends Controller
 
                 if($request->photo){
                     $name = time().'.'  . explode('/', explode(':', substr($request->photo, 0, strpos($request->photo, ';')))[1])[1];
-                    \Image::make($request->photo)->resize(300, 300)->save(public_path('images/enquiry/').$name);
+                    \Image::make($request->photo)->save(public_path('images/enquiry/').$name);
                     $request->merge(['photo' => $name]);
                     $enquiry->photo = $name;
                 }
-                $enquiry->save();
+                // $users = user::all()->except(Auth::id());
+                // dd(  $users->email);
+                // foreach($users as $user){
+               
+                // $email = $user->email;
+                // $msg = 'there are new Enquiry for you ' . $enquiry->title;
+                //  $emailContent =array(
+                //    'Name' =>$user->name,
+                //    'msg' =>$msg ,
+                  
+                //     );
+                
+                    // Mail::send(['html' => 'msg_enquery'], $emailContent, function ($message) use ($emailContent , $email) {
+
+                    //     $message->to($email)->subject('New enquiry')->from('pm@dashboard.mishkatnour.org', 'Mishkat Nour');
+                    //            });
+                    }
+                // $enquiry->save();
             
         }
      
-    }
+    
 
     /**
      * Display the specified resource.

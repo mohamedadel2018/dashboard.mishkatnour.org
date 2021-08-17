@@ -92,7 +92,7 @@
             <div class="col-md-10  mt-4 mb-4">
                 <div style="
                       height:500px;">
-                    <table class="table table-bordered table-fixed"
+                    <table class="table table-bordered table-responsive"
                            style="max-width:900px;
                          padding:2px;">
                         <thead>

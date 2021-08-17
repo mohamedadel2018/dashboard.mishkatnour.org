@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\task;
 use DB;
 use App\User;
+use App\note;
 use Carbon\Carbon;
 use App\project;
 use Mail;
@@ -14,9 +15,20 @@ use Mail;
 class followTaskController extends Controller
 {
     public function index() {
-        $tasks = task::where('isApproved' ,'=', '0')->orWhere('statusApproved' ,'=' , '0')->get();
+        
+
+        $tasks = task::where('isApproved' ,'=', '0')->orWhere('statusApproved' ,'=' , '0')->orderBy('created_at','desc')->paginate(30);
+        foreach($tasks as $task){
+          
+            if(Carbon::now()->toDateTimeString()  >=  $task->dueDate && $task->status == null ){
+               $one_task =  task::find($task->id);
+               $one_task->status = 'outDate';
+               $one_task->update();
+            }
+        }
         $users =  User::all();
-    	return  view('Dashboard.follow',compact('tasks','users'));
+        $status = null;
+    	return  view('Dashboard.follow',compact('tasks','users','status'));
     }
 
     public function taskConfirmation(Request $request){
@@ -48,12 +60,10 @@ class followTaskController extends Controller
             Mail::send(['html' => 'msg'], $emailContent, function ($message) use ($emailContent , $email) {
                     
                  $message->to($email)->subject('Task Confirmation')->from('pm@mishkatnour.org', 'Mishkat Nour');
-                            
-
                         });
 
 
-        return redirect()->back()->with('success', 'Branch is Added');
+        return redirect()->back()->with('success', 'Task Approved Successfully');
 
     }
 
@@ -93,7 +103,7 @@ class followTaskController extends Controller
                         });
 
 
-        return redirect()->back()->with('success', 'Branch is Added');
+        return redirect()->back()->with('success', 'Task Not Approved Successfully');
 
     }
 
@@ -109,7 +119,6 @@ class followTaskController extends Controller
         $task = task::find($request->id);
         $task->delete();
         return redirect()->back()->with('Deleted', 'Branch is Added');
-
     }
     
     public function statusConfirmation(Request $request){
@@ -193,7 +202,32 @@ class followTaskController extends Controller
 
                         });
         }
-    return redirect()->back()->with('success', 'Branch is Added');
+    return redirect()->back()->with('success', 'Task Approved Successfully');
+
+    }
+
+
+    public function followsearch(Request $request){
+        // dd($request->status);
+        if($request->status == "all"){
+            $tasks = task::where('isApproved' ,'=', '0')->orWhere('statusApproved' ,'=' , '0')->orderBy('created_at','desc')->get();
+        }elseif($request->status == 'need_approved'  ){
+            $tasks = task::where('isApproved' ,'=', '1')->where('status' ,'!=',null)->Where('statusApproved' ,'=' , '0')->orderBy('created_at','desc')->get();
+        }elseif($request->status == 'notes'  ){
+            $tasks =  task::whereHas('notes')->orderBy('created_at','desc')->get();
+        }elseif($request->status == 'tasks_user'  ){
+            $tasks = task::where('isApproved' ,'=', '0')->where('status' ,'=',null)->Where('statusApproved' ,'=' , '0')->orderBy('created_at','desc')->get();
+        }elseif($request->status == 'outDate'  ){
+            $tasks = task::where('status' , 'outDate')->orderBy('created_at','desc')->get();
+        }
+        else{
+            $tasks = task::where('isApproved' ,'=', '0')->where('status' ,$request->status)->orderBy('created_at','desc')->get();
+        }
+      
+       
+        $users =  User::all();
+        $status =  $request->status;
+        return  view('Dashboard.follow',compact('tasks','users','status'));
 
     }
     

@@ -14,7 +14,7 @@ use App\branch;
 use Auth;
 use DB;
 use Mail;
-
+use Carbon\Carbon;
 class projectController extends Controller
 {
     // OBJECTIVE
@@ -108,10 +108,6 @@ class projectController extends Controller
 
         $branchs = $request->input('branch');
 
-
-
-
-
         if($request->projectSelect != null){
          $Validator =  Validator::make($request->all(),[
 
@@ -121,13 +117,13 @@ class projectController extends Controller
             'branch' =>'required',
 
         ])->validate();
-
         $projectdata =  project::find($request->projectSelect);
          // try
          // {
              foreach($branchs as $branch){
                 $project = new project;
-                $project->name = $request->projectSelect;
+                
+                $project->name = $projectdata->name;
                 $project->description = $projectdata->description;
                 $project->location = $request->projectLocation;
                 $project->objective_id = $request->id;
@@ -217,6 +213,7 @@ class projectController extends Controller
     }
     public function editProject (Request $request) {
         // dd($request->all());
+
         if($request->objectiveSelect != null){
           DB::table('projects')
                  ->where('id', $request->project)
@@ -225,7 +222,7 @@ class projectController extends Controller
                     array(
                         'objective_id' => $request->objectiveSelect
                          ));
-        return redirect()->back()->with('updated' , 'updated');
+        return redirect()->back()->with('success', 'Update Successfully');
          }else{
             DB::table('projects')
             ->where('id', $request->project)
@@ -239,7 +236,7 @@ class projectController extends Controller
 
                     )
              );
-   return redirect()->back()->with('updated successfully' , 'updated');
+         return redirect()->back()->with('success', 'Update Successfully');
          }
 
 
@@ -300,28 +297,28 @@ class projectController extends Controller
 
          // send msg
             // select user
-             $user = user::find($request->ResponsibiltyInput);
-             $email = $user->email;
-             $msg = 'You have new task ' . $task->description;
-              $emailContent =array(
-                'Name' =>$user->name,
-                'msg' =>$msg ,
-                'projectName' =>$project->name ,
-                 );
+            //  $user = user::find($request->ResponsibiltyInput);
+            //  $email = $user->email;
+            //  $msg = 'You have new task ' . $task->description;
+            //   $emailContent =array(
+            //     'Name' =>$user->name,
+            //     'msg' =>$msg ,
+            //     'projectName' =>$project->name ,
+            //      );
 
-            Mail::send(['html' => 'msg'], $emailContent, function ($message) use ($emailContent , $email) {
+            // Mail::send(['html' => 'msg'], $emailContent, function ($message) use ($emailContent , $email) {
 
-                 $message->to($email)->subject('New Task')->from('pm@dashboard.mishkatnour.org', 'Mishkat Nour');
-                        });
+            //      $message->to($email)->subject('New Task')->from('pm@dashboard.mishkatnour.org', 'Mishkat Nour');
+            //             });
 
-         return redirect()->back()->with('success', 'Branch is Added');
+         return redirect()->back()->with('success', 'Task is Added');
 
 
     }
     public function deleteTask(Request $request) {
 
         $task = task::find($request->id)->delete();
-        return redirect()->back()->with('deleted', 'Branch is Added');
+        return redirect()->back()->with('deleted', 'Task is Deleted Successfully');
 
     }
     public function editTask(Request $request) {
@@ -378,23 +375,230 @@ class projectController extends Controller
     // available project
     public function myproject () {
 
+
+
+
+        if(Auth::user()->id   )
+        {
+         // chech if not admin or his profile
+             $user = User::find(Auth::user()->id);
+             $noaction = 0;
+              $done = 0 ;
+             $delay = 0 ;
+             $canceled = 0 ;
+             $late = 0 ;
+             $outDate = 0;
+             $block = 0 ;
+             $res_rows = $user->tasks()->get();
+             $tasks = array();
+             foreach ($res_rows as $res_row) {
+                 $status = $res_row->task()->first()->status;
+                 // $task = $res_row->task()->first()->description;
+                 // done
+                 switch ($status) {
+                     case null:
+                         $noaction ++ ;
+                         break;
+                     case 'done':
+                         $done ++ ;
+                         break;
+                     case 'late':
+                         $late ++ ;
+                         break;
+                     case 'delayed':
+                         $delay ++ ;
+                         break;
+                     case 'canceled':
+                         $canceled ++ ;
+                         break;
+                    case 'outDate':
+                        $outDate ++ ;
+                        break;
+                    case 'block':
+                        $block ++ ;
+                        break;
+ 
+                 }
+ 
+                 // array_push($tasks ,$task);
+ 
+             }
+         $data = array(
+             'noaction' => $noaction,
+             'done' => $done ,
+             'delay' => $delay,
+             'canceled' => $canceled,
+             'late' => $late,
+             'outDate' => $outDate,
+             'block' => $block,
+         );
+        }
+
+
         $users = user::all();
         $id = Auth::User()->id;
         $user = User::find($id);
         $rows = $user->tasks()->get()->sortBy('status');
+        $status = null;
+        $status_time = null;
         // echo $rows;
         // // $task_id = $rows->task_id;
         // $tasks = task::find($task_id)->first();
         $branch_id = Auth::user()->branch;
         $projects = project::groupBy('branch')->orderBy('id','asc')->get();
+      
+            $status = null;
+        
+     
         // dd( $projects);
-       return view('Dashboard.myProject')->with(['projects' => $projects , 'rows' => $rows , 'users' => $users]);
+       return view('Dashboard.myProject')->with(['projects' => $projects , 'rows' => $rows , 'users' => $users, 'data' => $data , 'status' => $status,'status_time' => $status_time]);
+
+    }
+
+    public function selectsearch(Request $request){
+      
+        if(Auth::user()->id   )
+        {
+         // chech if not admin or his profile
+             $user = User::find(Auth::user()->id);
+             $noaction = 0;
+              $done = 0 ;
+             $delay = 0 ;
+             $canceled = 0 ;
+             $late = 0 ;
+             $outDate = 0;
+             $block = 0;
+             $res_rows = $user->tasks()->get();
+             $tasks = array();
+             foreach ($res_rows as $res_row) {
+                 $status = $res_row->task()->first()->status;
+                 // $task = $res_row->task()->first()->description;
+                 // done
+                 switch ($status) {
+                     case null:
+                         $noaction ++;
+                         break;
+                     case 'done':
+                         $done ++ ;
+                         break;
+                     case 'late':
+                         $late ++ ;
+                         break;
+                     case 'delayed':
+                         $delay ++ ;
+                         break;
+                     case 'canceled':
+                         $canceled ++ ;
+                         break;
+                    case 'outDate':
+                         $outDate ++ ;
+                         break;
+                     case 'block':
+                         $block ++ ;
+                         break;
+  
+                 }
+ 
+                 // array_push($tasks ,$task);
+ 
+             }
+             $data = array(
+                'noaction' => $noaction,
+                'done' => $done ,
+                'delay' => $delay,
+                'canceled' => $canceled,
+                'late' => $late,
+                'outDate' => $outDate,
+                'block' => $block,
+            );
+        }
+
+        $users = user::all();
+        $id = Auth::User()->id;
+        $user = User::find($id);
+        $status =  $request->status;
+        $rows = $user->tasks()->get()->sortBy('status');
+        $status_time = null;
+        // echo $rows;
+        // // $task_id = $rows->task_id;
+        // $tasks = task::find($task_id)->first();
+        $branch_id = Auth::user()->branch;
+        $projects = project::groupBy('branch')->orderBy('id','asc')->get();
+      
+        // dd( $projects);
+        return view('Dashboard.myProject')->with(['projects' => $projects , 'rows' => $rows , 'users' => $users , 'data' => $data , 'status' => $status,'status_time'=> $status_time]); 
 
     }
 
 
+    public function timesearch(Request $request){
+            // dd($request->time);
+      if(Auth::user()->id   )
+        {
+         // chech if not admin or his profile
+             $user = User::find(Auth::user()->id);
+             $noaction = 0;
+              $done = 0 ;
+             $delay = 0 ;
+             $canceled = 0 ;
+             $late = 0 ;
+             $outDate = 0;
+             $block = 0;
+             $res_rows = $user->tasks()->get();
+             $tasks = array();
+             foreach ($res_rows as $res_row) {
+                 $status = $res_row->task()->first()->status;
+                 // $task = $res_row->task()->first()->description;
+                 // done
+                 switch ($status) {
+                     case null:
+                         $noaction ++;
+                         break;
+                     case 'done':
+                         $done ++ ;
+                         break;
+                     case 'late':
+                         $late ++ ;
+                         break;
+                     case 'delayed':
+                         $delay ++ ;
+                         break;
+                     case 'canceled':
+                         $canceled ++ ;
+                         break;
+                    case 'outDate':
+                         $outDate ++ ;
+                         break;
+                     case 'block':
+                         $block ++ ;
+                         break;
+  
+                 }
+ 
+                 // array_push($tasks ,$task);
+ 
+             }
+             $data = array(
+                'noaction' => $noaction,
+                'done' => $done ,
+                'delay' => $delay,
+                'canceled' => $canceled,
+                'late' => $late,
+                'outDate' => $outDate,
+                'block' => $block,
+            );
+        }
 
 
+        $users = user::all();
+        $id = Auth::User()->id;
+        $user = User::find(Auth::id());
+        $status = null;
+        $status_time =  $request->time;
+        $rows = $user->tasks()->get()->sortBy('status');
+        $branch_id = Auth::user()->branch;
+        $projects = project::groupBy('branch')->orderBy('id','asc')->get();
+        return view('Dashboard.myProject')->with(['projects' => $projects , 'rows' => $rows , 'users' => $users , 'data' => $data ,'status' => $status ,'status_time' => $status_time]); 
 
-
+    }
 }

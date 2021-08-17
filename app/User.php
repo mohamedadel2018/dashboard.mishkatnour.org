@@ -65,6 +65,10 @@ class User extends Authenticatable
         return $this->hasMany(enquiry::class,'for_id');
     }
 
+    public function getNameAttribute($value)
+    {
+        return ucfirst($value);
+    }
 
 
 

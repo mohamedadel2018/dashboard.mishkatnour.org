@@ -51,7 +51,7 @@ class userTaskController extends Controller
                 return redirect()->back()->with('fail', 'all fields rquierd');
          }
 
-         return redirect()->back()->with('success', 'Branch is Added');
+         return redirect()->back()->with('success', 'Task Sent to Admin successfully');
 
 
 
@@ -208,7 +208,9 @@ class userTaskController extends Controller
 
     // for make user add profile pic
     public function  addUserphoto(Request $request){
-
+        $request->validate([
+            'photo' =>'required',
+        ]);
         $user = user::find($request->id) ;
         if($request->photo &&  $user->photo != null ){
             $image_path = public_path().'/images/users/'.$user->photo;
@@ -234,14 +236,14 @@ class userTaskController extends Controller
 
 
 
-    public function add_note (Request $request) {
+    public function add_note(Request $request) {
 
 		$note = new note();
 		$note->note = $request->note ;
 		$note->task_id = $request->id ;
 		$note->user_id = Auth::user()->id ;
 		$note->save();
-		 return redirect()->back()->with('success', 'Branch is Added');
+		 return redirect()->back()->with('success', 'Note is Added');
 
 
 	}
@@ -255,7 +257,7 @@ class userTaskController extends Controller
               return  Response::download($file, $destination,$headers);
           }
 
-      return redirect()->back()->with('failur', 'Branch is Added');
+      return redirect()->back()->with('failur', 'download is fail');
     }
     public function shownotes(){
 

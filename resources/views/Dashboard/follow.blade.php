@@ -4,6 +4,32 @@ use App\task_paper;
 ?>
 @extends('Dashboard.structure')
 @section('dashboard_heading')
+
+<style>
+
+@media print {
+.not-print  {
+  display: none !important;
+}
+.table{
+    max-width: 2480px !important;
+    width:100% !important;
+    height: auto !important;
+  }
+.table td{
+    width: auto !important;
+    overflow: hidden !important;
+    word-wrap: break-word !important;
+  }
+}
+html, body, h1, h2, h3, h4, h5 {
+    font-family: 'Cairo', sans-serif;
+    font-size: 12px !important;
+}
+
+
+ </style>
+
   <p> PENDING TASKS</p>
 @endsection
 @section('structure_content')
@@ -48,47 +74,70 @@ use App\task_paper;
   <div class="row">
     <div class="col-md-11 ml-1">
         <div class="row">
-             <div class="col-md-2 mt-4">
-                    <select class="form-control" id="statusFilterSelect">
-                      <option value="">All</option>
-                      <option value="done">Done</option>
-                      <option value="late">Late</option>
-                      <option value="Delayed" >Delayed</option>
-                      <option value="Transfer">Transfer</option>
-                    </select>
+             <div class="col-md-3 mt-4">
+
+                <form class="inline-block " action="{{route('followsearch')}}" style="margin:auto;max-width:300px">
+                    <select name="status" value="{{old('status')}}" class="custom-select select">
+                          <option value="all">All</option>
+                          <option value="need_approved">need approve</option>
+                          <option value="tasks_user">tasks from user</option>
+                          <option value="notes">have Notes</option>
+                          <option value="outDate">Out Date</option>
+                          <option value="transfer">transfer</option>
+                          <option value="delayed">delayed</option>
+                          <option value="canceled">canceled</option>
+                         
+                          <option value="late">late</option>
+                          <option value="block">Block</option>
+                        </select>
+                      <button type="submit" class="btn btn-outline-success"><i class="fa fa-search"></i></button>
+                    </form>
+
+
              </div>
-             <div class="col-md-4 mt-4 offset-md-2 float-right">
+             <div class="col-md-3 mt-4 offset-md-1 float-right">
                <input class="form-control" id="myInput" type="text" placeholder="Search..">
              </div>
-
+             <div class="col-md-3 mt-4 offset-md-1 float-right">
+                <button class="btn btn-secondry  ml-4  float-right not-print" onclick={window.print()}><i class="fa fa-print" aria-hidden="true"></i></button>
+            
+                <div class="bg-purple text-white text-center col-md-8" style="padding:5%;font-size:12px;">
+                @if(count($tasks) > 0)
+                 Tasks Count: ({{ count($tasks)}})
+                @else
+                Number Tasks: 0
+                @endif
+          
+              </div>
+             </div>
        </div>
     </div>
   </div>
   <!-- end search -->
 
   <div class="row">
-    <div class="col-md-10 mt-4">
-    <div  style="overflow-x:auto; overflow-y:auto;
-    height:500px;">
-    <table class="table table-bordered table-fixed"
-            style="width:1500px";
-            padding:2px;
+    <div class="col-md-12 col-sm-12  col-xs-12 mt-4">
+    <div >
+    <table class="table table-bordered table-responsive"
+            style="overflow-x:auto; overflow-y:auto;
+            height:500px;width:100%; padding:2px;"
             >
          <thead class="thead-dark">
                       <tr>
                         <th scope="col">Actions</th>
                         <th scope="col">Project</th>
                         <th scope="col"> Task ID </th>
-                        <th scope="col"style="width:50%">Task</th>
-                         <th scope="col" >Quantity</th>
-                          <th scope="col" >Done Quantity</th>
+                        <th scope="col" style="min-width:250px;" >Task</th>
+                        <th scope="col" >Confirmation</th>
+                        <th scope="col" >Quantity</th>
+                         <th scope="col" >Done Quantity</th>
                         <th scope="col" >Responsibility</th>
+                         <th scope="col" >Due date</th>
                         <th scope="col" >Created at</th>
-                        <th scope="col" >Due date</th>
                         <th scope="col" >Files</th>
                         <th scope="col" >Status</th>
                         <th scope="col" >Status Date</th>
-                        <th scope="col"   >Confirmation</th>
+
                         <th scope="col" >Notes</th>
 
                       </tr>
@@ -220,15 +269,205 @@ use App\task_paper;
                         </div>
                       </div>
                     </div>
+                  </div>
                   <!-- end edit modal -->
+                    <!-- renwal modal -->
+                    <div class="modal fade" id="renwalModal{{$task->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">{{$task->description}} </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            </div>
+                            <div class="modal-body" >
 
+                            <form method="post" action="{{ route ('renwalDueTask')}}">
+                            @csrf
+                                <!-- Task -->
+                                <input type="hidden" name="id" value="{{$task->id}}">
+
+                                        <!-- due time date -->
+                                        <div class="form-row">
+                                        <div class="form-group col-md-12">
+                                            <label>change Due Date</label>
+                                        <input type="date" class="form-control" value="{{$task->dueDate}}" id="date" name="date">
+                                            {!! $errors->first('date', '<small style="color:red;">:message</small>') !!}
+
+                                        </div>
+
+                                        </div>
+
+                                        <!-- end due time date -->
+                                <!-- end of project -->
+
+                                <br>
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </form>
+                            <div class="modal-footer">
+
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                    <!-- end renwal modal -->
+
+                    <!-- block modal -->
+                    <div class="modal fade" id="blockModal{{$task->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">{{$task->description}} </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+                        <div class="modal-body" style="color: red">
+                            <p class="font-14"> Sure you Want to Block This Task?</p>
+                        </div>
+                        <div class="modal-footer">
+
+                        <form method="post" action="{{ route ('blockTask') }}">
+                            @csrf
+                        <input type="hidden" value="{{$task->id}}" name="id">
+                            <input type="submit" class="btn btn-dark" value="Block">
+                        </form>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                    </div>
+                    </div>
+                    <!-- end block modal -->
                       </td>
 
-                          <td  >{{$task->project()->first()->name}}</td>
-                          <td  > {{$task->id}}</td>
-                          <td style="direction:rtl;">
+                          <td  style="  white-space:normal !important;" >{{$task->project()->first()->name}}</td>
+                          <td>
+                              {{-- for task have Note --}}
+                            @if (count($task->notes) > 0)
+                                <div class="spinner-grow text-primary" style="width: 15px;height:15px" title="Task have Note" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                            @endif {{$task->id}}
+                        </td>
+
+                          <td class="font-14" style="white-space:normal !important;direction:rtl;">
                                {{$task->description}}
+
                           </td>
+                          @if($task->status == 'outDate')
+                          {{-- for outdate option --}}
+                                    <td>
+                                        <div class="row">
+                                        <!-- notApproved -->
+
+
+
+                                        <?php
+                                        $reps  = $task->tasks()->get();
+                                        ?>
+                                        @foreach($reps as $res)
+                                        <?php $responsibility =$res->user_id;  ?>
+                                    @endforeach
+                                            <!-- check if approved transfered -->
+
+                                            <div class="col-md-4">
+                                                    <button  class="btn btn-success showTitle" data-toggle="modal" data-target="#renwalModal{{$task->id}}" title="Renwal Task" >
+                                                        <i class="fa fa-refresh" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            @if($task->status != 'block')
+                                                <div class="col-md-6">
+                                                    <button  class="btn btn-info showTitle" data-toggle="modal" data-target="#blockModal{{$task->id}}" title="Block Task" >
+                                                        <i class="fa fa-hand-paper-o" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                                @endif
+                                        </div>
+
+                                    </td>
+                          @else
+                          <td>
+                            <div class="row">
+                              <!-- notApproved -->
+
+                              @if($task->isApproved == 0)
+                                <div class="col-md-4">
+
+                                    <form action = "{{ route ('taskConfirmation')}}" method="post">
+                                      @csrf
+                                      <input type="hidden" name="id" value="{{$task->id}}">
+                                      <button type="submit" class="btn btn-success showTitle" title="approve task">
+
+                                        <i class="fa fa-check" aria-hidden="true"></i>
+
+                                      </button>
+                                    </form>
+                                  </div>
+                                  <div class="col-md-6">
+
+                                     <form action = "{{ route ('taskDenay')}}" method="post">
+                                      @csrf
+                                      <input type="hidden" name="id" value="{{$task->id}}">
+                                      <button type="submit" class="btn btn-danger">
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+
+                                      </button>
+                                    </form>
+                                 </div>
+
+                              @elseif(is_null($task->status))
+                              <div class="col-md-12">
+                                <p> not updated yet </p>
+                                </div>
+                              @elseif(!is_null($task->status))
+
+                              <?php
+                              $reps  = $task->tasks()->get();
+                             ?>
+                              @foreach($reps as $res)
+                            <?php $responsibility =$res->user_id;  ?>
+                          @endforeach
+                                <!-- check if approved transfered -->
+                                 @if($task->alternative != $responsibility )
+                                   <div class="col-md-4">
+                                        <form action = "{{route('statusConfirmation')}}" method="post">
+                                          @csrf
+                                          <input type="hidden" name="id" value="{{$task->id}}">
+                                          <button type="submit" class="btn btn-success showTitle" title="approve Status" >
+
+                                           <i class="fa fa-check" aria-hidden="true"></i>
+
+                                          </button>
+                                        </form>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <form action = "{{route('taskNotConfirmation')}}" method="post">
+                                            @csrf
+                                            <input type="hidden" name="id" value="{{$task->id}}">
+                                            <button type="submit" class="btn btn-info showTitle" title="not approved Status" >
+                                                <i class="fa fa-hand-paper-o" aria-hidden="true"></i>
+                                              </button>
+                                          </form>
+                                    </div>
+                                @else
+                                <div class="col-md-12">
+                                    <p> not updated yet </p>
+                                </div>
+
+
+                              @endif
+
+
+
+                              @endif
+                            </div>
+
+                          </td>
+                          @endif
                           <td > {{$task->quantity}}</td>
                           <?php
                           $task_papers = task_paper::where('task_id',$task->id)->get();
@@ -277,6 +516,7 @@ use App\task_paper;
 
 
                         </td>
+                         <td>{{$task->dueDate}}</td>
                         <td  >
                            @if($task->isApproved == 0)
                                 {{$task->created_at}} by user
@@ -291,10 +531,10 @@ use App\task_paper;
                               @endif
                             @endif
                         </td>
-                        <td  >{{$task->dueDate}}</td>
+                       
 
 
-                        <td>
+                        <td style="white-space:normal !important;">
                             <?php
                             $paper = $task->task_papers()->get();
                              ?>
@@ -330,77 +570,8 @@ use App\task_paper;
                           <td>
                             {{$task->statusDate}}
                           </td>
-                          <td>
-                            <div class="row">
-                              <!-- notApproved -->
 
-                              @if($task->isApproved == 0)
-                                <div class="col-md-6">
-
-                                    <form action = "{{ route ('taskConfirmation')}}" method="post">
-                                      @csrf
-                                      <input type="hidden" name="id" value="{{$task->id}}">
-                                      <button type="submit" class="btn btn-success showTitle" title="approve task">
-
-                                        <i class="fa fa-check" aria-hidden="true"></i>
-
-                                      </button>
-                                    </form>
-                                  </div>
-                                  <div class="col-md-6">
-
-                                     <form action = "{{ route ('taskDenay')}}" method="post">
-                                      @csrf
-                                      <input type="hidden" name="id" value="{{$task->id}}">
-                                      <button type="submit" class="btn btn-danger">
-                                        <i class="fa fa-trash" aria-hidden="true"></i>
-
-                                      </button>
-                                    </form>
-                                 </div>
-
-                              @elseif(is_null($task->status))
-                              <div class="col-md-12">
-                                <p> not updated yet </p>
-                                </div>
-                              @elseif(!is_null($task->status))
-                                <!-- check if approved transfered -->
-                                 @if($task->alternative != $responsibility )
-                                   <div class="col-md-6">
-                                        <form action = "{{route('statusConfirmation')}}" method="post">
-                                          @csrf
-                                          <input type="hidden" name="id" value="{{$task->id}}">
-                                          <button type="submit" class="btn btn-success showTitle" title="approve Status" >
-
-                                           <i class="fa fa-check" aria-hidden="true"></i>
-
-                                          </button>
-                                        </form>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <form action = "{{route('taskNotConfirmation')}}" method="post">
-                                            @csrf
-                                            <input type="hidden" name="id" value="{{$task->id}}">
-                                            <button type="submit" class="btn btn-info showTitle" title="not approved Status" >
-                                                <i class="fa fa-hand-paper-o" aria-hidden="true"></i>
-                                              </button>
-                                          </form>
-                                    </div>
-                                @else
-                                <div class="col-md-12">
-                                    <p> not updated yet </p>
-                                </div>
-
-
-                              @endif
-
-
-
-                              @endif
-                            </div>
-
-                          </td>
-                          <td  >
+                          <td >
                            <?php $notes = $task->notes()->get() ?>
 								@foreach($notes as $note)
 								  <p style="background-color : #b3d7ff"> <b> {{$note->note}} <b> <p>
@@ -413,9 +584,13 @@ use App\task_paper;
 
                     </tbody>
         </table>
+        @if($status == null)
+          {{$tasks->links()}}
+        @endif
         </div>
+      
      </div>
-
+    
   </div>
 
 

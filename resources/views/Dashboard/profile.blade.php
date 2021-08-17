@@ -7,7 +7,7 @@
     width: 25px;
 
   }
-  @media window.print {
+  @media print {
 .not-print  {
   display: none !important;
 }
@@ -64,7 +64,8 @@
                   ['No action', {{$data['noaction']}}],
                   ['Delayed', {{$data['delay']}}],
                   ['late', {{$data['late']}}],
-
+                  ['outDate', {{$data['outDate']}}],
+                  ['block', {{$data['block']}}],
 
                     ]);
 
